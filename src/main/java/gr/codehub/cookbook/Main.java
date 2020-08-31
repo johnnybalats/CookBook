@@ -1,6 +1,7 @@
 package gr.codehub.cookbook;
 
 import gr.codehub.cookbook.exceptions.BusinessException;
+import gr.codehub.cookbook.exceptions.InvalidAgeException;
 import gr.codehub.cookbook.model.CookBook;
 import gr.codehub.cookbook.model.Ingredient;
 import gr.codehub.cookbook.model.Recipe;
@@ -14,12 +15,35 @@ public class Main {
 
     public static void main(String[] args) {
 
-        System.out.println("\n----- Testing Read File -----");
-        testReadFile();
-        System.out.println("\n----- Testing Cook Book -----");
-        testCookBook();
-        System.out.println("\n----- Testing Recipe Words -----");
-        testRecipeWords();
+//        System.out.println("\n----- Testing Read File -----");
+//        testReadFile();
+//        System.out.println("\n----- Testing Cook Book -----");
+//        testCookBook();
+//        System.out.println("\n----- Testing Recipe Words -----");
+//        testRecipeWords();
+
+        try {
+            showAge(34);
+        } catch (BusinessException e) {
+            e.printStackTrace();
+            System.out.println("Bad luck");
+        } catch (InvalidAgeException e) {
+            e.printStackTrace();
+            System.out.println("Bad business");
+        } finally {
+            System.out.println("It is over");
+        }
+    }
+
+    private static void showAge(int age) throws BusinessException, InvalidAgeException {
+
+        if (age < 1 || age > 122)
+            throw new InvalidAgeException();
+
+        if (Math.random() > 0.5)
+            throw  new BusinessException(43, "Unlucky exception");
+
+        System.out.println("The age is " + age);
     }
 
     private static  String readFile(File file) throws BusinessException {
@@ -31,7 +55,7 @@ public class Main {
             System.out.println("read file step 3");
         } catch (FileNotFoundException e) {
             System.out.println("read file step 4");
-            throw new BusinessException();
+            throw new BusinessException(12, "Exception occurred");
         }
         System.out.println("read file step 5");
         return "(some content from the file)";
@@ -54,21 +78,42 @@ public class Main {
         for (Recipe recipe: allRecipes)
             System.out.println("Recipe = " + recipe.getName());
 
-        List<Ingredient> allIngredients = new ArrayList<>();
-        for (Recipe recipe: allRecipes)
-            allIngredients.addAll(recipe.getIngredients());
+        List<Ingredient> allIngredients = allRecipes
+                .stream()
+                .flatMap(recipe -> recipe.getIngredients().stream())
+                .collect(Collectors.toList());
+
+//        List<Ingredient> allIngredients = new ArrayList<>();
+//        for (Recipe recipe: allRecipes)
+//            allIngredients.addAll(recipe.getIngredients());
+
         System.out.println("\nThe book recipes uses " + allIngredients.size() + " ingredients (with quantities)");
         for (Ingredient ingredient: allIngredients)
             System.out.println("Ingredient = " + ingredient.getName() + ", " + ingredient.getQuantity());
 
-        Set<Ingredient> allUniqueIngredients = new HashSet<>(allIngredients);
+//        Set<Ingredient> allUniqueIngredients = new HashSet<>(allIngredients);
+
+        List<Ingredient> allUniqueIngredients = allIngredients
+                .stream()
+                .distinct()
+                .collect(Collectors.toList());
+
         System.out.println("\nThe book recipes uses " + allUniqueIngredients.size() + " unique ingredients (with quantities)");
         for (Ingredient ingredient: allUniqueIngredients)
             System.out.println("Unique ingredient = " + ingredient.getName() + ", " + ingredient.getQuantity());
 
-        Set<String> allIngredientTypes = new HashSet<>();
-        for (Ingredient ingredient: allIngredients)
-            allIngredientTypes.add(ingredient.getName());
+//        Set<String> allIngredientTypes = new HashSet<>();
+//        for (Ingredient ingredient: allIngredients)
+//            allIngredientTypes.add(ingredient.getName());
+
+        List<String> allIngredientTypes = allUniqueIngredients
+                .stream()
+                .map(i -> i.getName())
+                .distinct()
+                .sorted()
+                .collect(Collectors.toList());
+
+
         System.out.println("\nThe book recipes uses " + allIngredientTypes.size() + " unique ingredient types");
         for (String name: allIngredientTypes)
             System.out.println("Unique ingredient type = " + name);
