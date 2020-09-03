@@ -13,6 +13,7 @@ public class LineIO {
 
         boolean finished = false;
         while (!finished) {
+
             String b = in.readLine();
             if (b == null)
                 finished = true;
@@ -23,25 +24,5 @@ public class LineIO {
         in.close();
 
         return lines;
-    }
-
-    public static void writeFile(String outFilename, List<String> lines) {
-
-    }
-
-    public static void main(String[] args) {
-
-        List<String> bookLines = null;
-
-        try {
-            bookLines = readFile("C:\\Users\\john\\Documents\\myFile.txt");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        for (String line: bookLines)
-            System.out.println(line);
-
-        bookLines.forEach(System.out::println);
     }
 }

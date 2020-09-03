@@ -4,7 +4,7 @@ import java.io.*;
 
 public class DataIO {
 
-    public static void saveDemo(String outFilename) throws IOException {
+    public static void saveData(String outFilename) throws IOException {
 
         DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(new File(outFilename))));
 
@@ -23,14 +23,5 @@ public class DataIO {
         System.out.println("pi = " + pi);
         System.out.println("number = " + num);
         System.out.println("string = " + str);
-    }
-
-    public static void main(String[] args) {
-
-        try {
-            saveDemo("C:\\Users\\john\\Documents\\Templates\\data.txt");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }

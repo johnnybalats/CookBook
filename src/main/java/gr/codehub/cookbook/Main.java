@@ -2,9 +2,8 @@ package gr.codehub.cookbook;
 
 import gr.codehub.cookbook.exceptions.BusinessException;
 import gr.codehub.cookbook.exceptions.InvalidAgeException;
-import gr.codehub.cookbook.model.CookBook;
-import gr.codehub.cookbook.model.Ingredient;
-import gr.codehub.cookbook.model.Recipe;
+import gr.codehub.cookbook.io.*;
+import gr.codehub.cookbook.model.*;
 import gr.codehub.cookbook.service.CookBookService;
 
 import java.io.*;
@@ -13,30 +12,110 @@ import java.util.stream.Collectors;
 
 public class Main {
 
+    private static final String ROOT = "C:\\Users\\john\\Documents\\";
+
     public static void main(String[] args) {
 
-//        System.out.println("\n----- Testing Read File -----");
-//        testReadFile();
+        System.out.println("\n----- Testing BYTE IO -----");
+        testByteIO();
+        System.out.println("\n----- Testing DATA IO -----");
+        testDataIO();
+        System.out.println("\n----- Testing LINE IO -----");
+        testLineIO();
+        System.out.println("\n----- Testing OBJECT IO -----");
+        testObjectIO();
+        System.out.println("\n----- Testing MEMORY IO -----");
+        testMemoryIO();
+        System.out.println("\n----- Testing Exceptions -----");
+        int result = setAgeHandleException();
+        System.out.println("The result is " + result);
 //        System.out.println("\n----- Testing Cook Book -----");
 //        testCookBook();
 //        System.out.println("\n----- Testing Recipe Words -----");
 //        testRecipeWords();
+    }
 
+    private static void testByteIO() {
+
+        System.out.println("Start copying files..");
         try {
-            showAge(34);
-        } catch (BusinessException e) {
-            e.printStackTrace();
-            System.out.println("Bad luck");
-        } catch (InvalidAgeException e) {
-            e.printStackTrace();
-            System.out.println("Bad business");
-        } finally {
-            System.out.println("It is over");
+
+            ByteIO.copyFile(ROOT + "CV_Mpalatsos_EN.pdf", ROOT + "b.pdf");
+        } catch (IOException e) {
+
+            System.out.println("Error: It was not possible to copy the file.");
+        }
+
+        System.out.println("Finished copying file!");
+    }
+
+    private static void testDataIO() {
+
+        System.out.println("Start saving file..");
+        try {
+
+            DataIO.saveData(ROOT + "data_io.txt");
+        } catch (IOException e) {
+
+            System.out.println("Error: It was not possible to save the file.");
+        }
+
+        System.out.println("Finished saving file!");
+    }
+
+    private static void testLineIO() {
+
+        List<String> bookLines = null;
+
+        System.out.println("Start reading files..");
+        try {
+
+            bookLines = LineIO.readFile(ROOT + "file1.txt");
+        } catch (IOException e) {
+
+            System.out.println("Error: It was not possible to read the file.");
+        }
+
+        System.out.println("Finished saving file!");
+
+        if (bookLines != null)
+            bookLines.forEach(System.out::println);
+    }
+
+    private static void testObjectIO() {
+
+        System.out.println("Copying an object to a new object using files..");
+        try {
+
+            Person p1 = new Person("John", 26);
+            ObjectIO.saveObject(ROOT + "object_io.txt", p1);
+
+            Person p2 = (Person) ObjectIO.readObject(ROOT + "object_io.txt");
+            System.out.println(p2.getName() + " is " + p2.getAge() + " years old");
+        } catch (Exception e) {
+
+            System.out.println("Error: It was not possible to copy the object.");
         }
     }
 
-    private static void showAge(int age) throws BusinessException, InvalidAgeException {
+    private static void testMemoryIO() {
 
+        System.out.println("Copying an object to a new object in memory..");
+        try {
+
+            MemoryIO<Car> mio = new MemoryIO<>();
+            Car car1 = new Car("Ford Model T", 20000);
+            Car car2 = mio.copyObject(car1);
+            System.out.println(car2.getModel() + " costs $" + car2.getPrice());
+        } catch (Exception e) {
+
+            System.out.println("Error: It was not possible to copy the object.");
+        }
+    }
+
+    private static void showAgeWithException(int age) throws BusinessException, InvalidAgeException {
+
+        System.out.println("Trying to set the age to " + age);
         if (age < 1 || age > 122)
             throw new InvalidAgeException();
 
@@ -46,26 +125,20 @@ public class Main {
         System.out.println("The age is " + age);
     }
 
-    private static  String readFile(File file) throws BusinessException {
+    private static int setAgeHandleException() {
 
-        System.out.println("read file step 1");
         try {
-            System.out.println("read file step 2");
-            BufferedReader br = new BufferedReader((new FileReader(file)));
-            System.out.println("read file step 3");
-        } catch (FileNotFoundException e) {
-            System.out.println("read file step 4");
-            throw new BusinessException(12, "Exception occurred");
-        }
-        System.out.println("read file step 5");
-        return "(some content from the file)";
-    }
 
-    private static void testReadFile() {
-        try {
-            readFile(new File("something.smth"));
+            showAgeWithException(134);
+            return 0;
         } catch (BusinessException e) {
-            System.out.println("Business error: cannot see the contents of this file");
+            System.out.println("Bad luck in setting age.");
+            return 1;
+        } catch (InvalidAgeException e) {
+            System.out.println("Bad business in setting age.");
+            return 2;
+        } finally {
+            System.out.println("Finished setting age!");
         }
     }
 
